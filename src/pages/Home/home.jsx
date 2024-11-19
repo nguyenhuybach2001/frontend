@@ -5,6 +5,7 @@ import s from "./home.module.scss";
 import { Carousel } from "antd";
 import apiCaller from "../../api/apiCaller";
 import { homeApi } from "../../api/homeApi";
+import axios from "axios";
 
 function Home() {
   const dispatch = useDispatch();
@@ -37,7 +38,12 @@ function Home() {
     return null; // Nếu có lỗi, trả về null
   };
   useEffect(() => {
-    console.log(fetchTopDiscounts({ category: "Thời trang Nam" }));
+    const res = axios.get(
+      "https://cadf-2405-4803-fc80-2ae0-2c08-cc41-d64e-d96f.ngrok-free.app/api/v1/products/top-discounts",
+      { category_name: "Thời trang Nam" }
+    );
+    console.log(res, "kjnjn");
+    // console.log(fetchTopDiscounts({ category: "Thời trang Nam" }));
   }, []);
   return (
     <div className={s.wrapper}>
