@@ -1,0 +1,22 @@
+.wrapper {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 999;
+}
+.body {
+  align-items: center;
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  height: 60px;
+  gap: 20px;
+  .links {
+    display: flex;
+    gap: 12px;
+  }
+}
+.scroll {
+  box-shadow: 0 10px 15px #0000000d;
+}
