@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { increment } from "../../features/counterSlice";
 import s from "./home.module.scss";
@@ -8,42 +8,27 @@ import { homeApi } from "../../api/homeApi";
 import axios from "axios";
 
 function Home() {
-  const dispatch = useDispatch();
-  const count = useSelector((state) => state.counter.value);
-  const API_URL = import.meta.env.VITE_API_URL;
-  const onChange = (currentSlide) => {
-    console.log(currentSlide);
-  };
-  const contentStyle = {
-    margin: 0,
-    height: "160px",
-    color: "#fff",
-    lineHeight: "160px",
-    textAlign: "center",
-    background: "#364d79",
-  };
+  const [data1, setData1] = useState([]);
+  const [data2, setData2] = useState([]);
+  const [data3, setData3] = useState([]);
   const fetchTopDiscounts = async (data) => {
     const response = await apiCaller({
-      request: homeApi.top_discount(data), // Truyền hàm request được định nghĩa
+      request: homeApi.top_discount(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
     });
 
     if (response) {
-      console.log("Top Discounts:", response);
-      return response; // Xử lý thêm hoặc trả về dữ liệu
+      return response;
     }
 
-    return null; // Nếu có lỗi, trả về null
+    return null;
   };
   useEffect(() => {
-    const res = axios.get(
-      "https://cadf-2405-4803-fc80-2ae0-2c08-cc41-d64e-d96f.ngrok-free.app/api/v1/products/top-discounts",
-      { category_name: "Thời trang Nam" }
+    fetchTopDiscounts({ category_id: "s1722" }).then((res) =>
+      setData1(res.data.products)
     );
-    console.log(res, "kjnjn");
-    // console.log(fetchTopDiscounts({ category: "Thời trang Nam" }));
   }, []);
   return (
     <div className={s.wrapper}>
@@ -52,64 +37,28 @@ function Home() {
         <p>Welcome to the Home Page!</p>
       </div>
       <h2>Thời trang nam</h2>
-      <Carousel arrows afterChange={onChange}>
-        <div>
-          <h3 style={contentStyle}>1</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>2</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>3</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>4</h3>
-        </div>
+      <Carousel autoplay autoplaySpeed={1500} slidesToShow={3}>
+        {data1.map((val, index) => (
+          <div key={index} className={s.image}>
+            <img src={val.image_url} alt="image" />
+          </div>
+        ))}
       </Carousel>
       <h2>Thời trang nam</h2>
-      <Carousel arrows afterChange={onChange}>
-        <div>
-          <h3 style={contentStyle}>1</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>2</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>3</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>4</h3>
-        </div>
+      <Carousel autoplay autoplaySpeed={1500} slidesToShow={3}>
+        {data1.map((val, index) => (
+          <div key={index} className={s.image}>
+            <img src={val.image_url} alt="image" />
+          </div>
+        ))}
       </Carousel>
       <h2>Thời trang nam</h2>
-      <Carousel arrows afterChange={onChange}>
-        <div>
-          <h3 style={contentStyle}>1</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>2</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>3</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>4</h3>
-        </div>
-      </Carousel>
-      <h2>Thời trang nam</h2>
-      <Carousel arrows afterChange={onChange}>
-        <div>
-          <h3 style={contentStyle}>1</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>2</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>3</h3>
-        </div>
-        <div>
-          <h3 style={contentStyle}>4</h3>
-        </div>
+      <Carousel autoplay autoplaySpeed={1500} slidesToShow={3}>
+        {data1.map((val, index) => (
+          <div key={index} className={s.image}>
+            <img src={val.image_url} alt="image" />
+          </div>
+        ))}
       </Carousel>
     </div>
   );

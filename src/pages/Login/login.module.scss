@@ -1,0 +1,28 @@
+.body {
+  height: 100vh;
+  background: linear-gradient(83.47deg, #ffcb08 9.02%, #ff9600 90.81%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.form {
+  max-width: 400px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 25px;
+  p {
+    margin: 0;
+  }
+  button {
+    width: 100%;
+    border-radius: 100px;
+    background: linear-gradient(83.47deg, #ffcb08 9.02%, #ff9600 90.81%);
+    &:hover {
+      background: linear-gradient(
+        83.47deg,
+        #ffcb08 9.02%,
+        #ff9600 90.81%
+      ) !important;
+    }
+  }
+}

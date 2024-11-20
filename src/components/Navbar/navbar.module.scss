@@ -5,18 +5,36 @@
   z-index: 999;
 }
 .body {
+  padding: 0 25px;
   align-items: center;
-  max-width: 1100px;
+  max-width: 1250px;
   margin: auto;
   display: flex;
   justify-content: space-between;
-  height: 60px;
+  height: 70px;
   gap: 20px;
   .links {
     display: flex;
-    gap: 12px;
+    gap: 15px;
+    align-items: center;
+    a {
+      text-decoration: none;
+      color: black;
+      &:active {
+        color: black;
+      }
+    }
+  }
+  h1 {
+    margin: 0 30px 0 0;
   }
 }
 .scroll {
   box-shadow: 0 10px 15px #0000000d;
+}
+.dropdown {
+  ul {
+    max-height: 200px !important;
+    overflow-y: auto;
+  }
 }
