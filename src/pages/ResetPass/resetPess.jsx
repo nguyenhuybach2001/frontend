@@ -1,15 +1,21 @@
 import { Button, Form, Input } from "antd";
-import React from "react";
-import s from "./login.module.scss";
+import React, { useEffect } from "react";
+import s from "./resetPass.module.scss";
 import apiCaller from "../../api/apiCaller";
 import { authApi } from "../../api/authApi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "antd/es/form/Form";
 
-export default function Login() {
+export default function ResetPass() {
+  const [form] = useForm();
   const navigate = useNavigate();
-  const fetchLogin = async (data) => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+  const email = queryParams.get("email");
+  const fetchReset = async (data) => {
     const response = await apiCaller({
-      request: authApi.login(data),
+      request: authApi.resetPass(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
@@ -21,21 +27,32 @@ export default function Login() {
 
     return null;
   };
-
+  useEffect(() => {
+    if (email) {
+      form.setFieldsValue({
+        email: email,
+      });
+    }
+  }, []);
   const onFinish = (values) => {
-    const formData = new URLSearchParams();
-    formData.append("username", values.email);
-    formData.append("password", values.password);
-
-    fetchLogin(formData).then((res) => {
-      localStorage.setItem("access_token", res.data.access_token);
-      navigate("/");
+    const data = {
+      token: token,
+      email: email,
+      password: values.password,
+    };
+    fetchReset(data).then((res) => {
+      console.log("ộhjkkol");
     });
   };
 
   return (
     <div className={s.body}>
-      <Form onFinish={onFinish} className={s.form} layout="vertical">
+      <Form
+        onFinish={onFinish}
+        form={form}
+        className={s.form}
+        layout="vertical"
+      >
         <h1>Login</h1>
         <Form.Item
           label="Email"
@@ -44,10 +61,6 @@ export default function Login() {
             {
               required: true,
               message: "Please input your email!",
-            },
-            {
-              type: "email",
-              message: "The input is not a valid email!",
             },
           ]}
         >
@@ -65,12 +78,6 @@ export default function Login() {
           ]}
         >
           <Input.Password />
-        </Form.Item>
-
-        <Form.Item name="remember" valuePropName="checked" label={null}>
-          <p onClick={() => navigate("/forget")} style={{ cursor: "pointer" }}>
-            Forget password
-          </p>
         </Form.Item>
 
         <Form.Item label={null}>

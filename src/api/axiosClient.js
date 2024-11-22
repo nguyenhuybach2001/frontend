@@ -9,15 +9,15 @@ const axiosClient = axios.create({
 });
 
 // Interceptor cho request
-// axiosClient.interceptors.request.use(async (config) => {
-//   const access_token = localStorage.getItem("access_token");
+axiosClient.interceptors.request.use(async (config) => {
+  const access_token = localStorage.getItem("access_token");
 
-//   if (access_token) {
-//     config.headers.Authorization = `Bearer ${access_token}`;
-//   }
+  if (access_token) {
+    config.headers.Authorization = `Bearer ${access_token}`;
+  }
 
-//   return config;
-// });
+  return config;
+});
 
 // Interceptor cho response
 // axiosClient.interceptors.response.use(

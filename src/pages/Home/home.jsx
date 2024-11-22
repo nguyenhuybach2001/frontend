@@ -6,6 +6,7 @@ import { Carousel } from "antd";
 import apiCaller from "../../api/apiCaller";
 import { homeApi } from "../../api/homeApi";
 import axios from "axios";
+import { authApi } from "../../api/authApi";
 
 function Home() {
   const [data1, setData1] = useState([]);
@@ -25,11 +26,13 @@ function Home() {
 
     return null;
   };
+
   useEffect(() => {
     fetchTopDiscounts({ category_id: "s1722" }).then((res) =>
       setData1(res.data.products)
     );
   }, []);
+  console.log(data1, "uhij");
   return (
     <div className={s.wrapper}>
       <div className={s.body}>

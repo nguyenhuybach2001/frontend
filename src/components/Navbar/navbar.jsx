@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import s from "./navbar.module.scss";
 import { Dropdown, Menu, Modal } from "antd";
 import apiCaller from "../../api/apiCaller";
 import { homeApi } from "../../api/homeApi";
+import { authApi } from "../../api/authApi";
 
 function Navbar() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
   const [isVisible, setIsVisible] = useState(false);
   const [list1, setList1] = useState([]);
   const [list2, setList2] = useState([]);
@@ -24,8 +26,25 @@ function Navbar() {
 
     return null;
   };
+  const fetchUser = async (data) => {
+    const response = await apiCaller({
+      request: authApi.user(data),
+      errorHandler: (error) => {
+        console.error("Failed to fetch top discounts:", error);
+      },
+    });
 
+    if (response) {
+      return response;
+    }
+
+    return null;
+  };
   useEffect(() => {
+    const data = { token: localStorage.getItem("access_token") };
+    fetchUser(data).then((res) => {
+      setUser(res.data);
+    });
     fetchTopDiscounts({ platform: "t" }).then((res) => setList1(res.data));
     fetchTopDiscounts({ platform: "s" }).then((res) => setList2(res.data));
     const handleScroll = () => {
@@ -35,22 +54,11 @@ function Navbar() {
         setIsVisible(false);
       }
     };
-
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   const item1 = list1.map((item, index) => ({
     key: `list1-${index + 1}`,
     label: item.category_name,
@@ -59,6 +67,21 @@ function Navbar() {
     key: `list2-${index + 1}`,
     label: item.category_name,
   }));
+  const items = [
+    {
+      key: "1",
+      label: (
+        <p
+          onClick={() => {
+            localStorage.clear();
+            navigate(0);
+          }}
+        >
+          Log out
+        </p>
+      ),
+    },
+  ];
   return (
     <>
       <div className={s.wrapper + " " + (isVisible && s.scroll)}>
@@ -84,9 +107,15 @@ function Navbar() {
             </Link>
           </div>
           <div>
-            <Link to="/login">
-              <button>Login</button>
-            </Link>
+            {user ? (
+              <Dropdown overlayClassName={s.dropdown} menu={{ items }}>
+                <p style={{ cursor: "default" }}>{user.name}</p>
+              </Dropdown>
+            ) : (
+              <Link to="/login">
+                <button>Login</button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
