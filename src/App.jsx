@@ -9,6 +9,9 @@ import Verify from "./pages/Verify/verify";
 import Forget from "./pages/Forget/forget";
 import ResetPass from "./pages/ResetPass/resetPess";
 import ProductScreen from "./pages/Products/product";
+import AnalysisScreen from "./pages/Analysis/analysis";
+import SearchScreen from "./pages/Search/search";
+import TrackingShop from "./pages/TrangkingShop";
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<ProductScreen />} />
+          <Route path="/analysis" element={<AnalysisScreen />} />
+          <Route path="/search" element={<SearchScreen />} />
+          <Route path="/tracking-shop" element={<TrackingShop />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />

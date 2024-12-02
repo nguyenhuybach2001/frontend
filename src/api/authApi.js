@@ -14,7 +14,6 @@ export const authApi = {
     return () => {
       return axiosClient.get("/users/me", {
         headers: { Authorization: `Bearer ${data.token}` },
-        params: data,
       });
     };
   },
