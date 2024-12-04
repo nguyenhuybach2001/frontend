@@ -12,6 +12,8 @@ import ProductScreen from "./pages/Products/product";
 import AnalysisScreen from "./pages/Analysis/analysis";
 import SearchScreen from "./pages/Search/search";
 import TrackingShop from "./pages/TrangkingShop";
+import ShopScreen from "./pages/Shop/shop";
+import TrackingProduct from "./pages/TrangkingProduct";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path="/analysis" element={<AnalysisScreen />} />
           <Route path="/search" element={<SearchScreen />} />
           <Route path="/tracking-shop" element={<TrackingShop />} />
+          <Route path="/tracking-product" element={<TrackingProduct />} />
+          <Route path="/shop" element={<ShopScreen />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />

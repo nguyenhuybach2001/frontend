@@ -36,10 +36,10 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-export default function TrackingShop() {
+export default function TrackingProduct() {
   const navigate = useNavigate();
-  const [dataShop, setDataShop] = useState([]);
-  const [dataShopDetail, setDataShopDetail] = useState([]);
+  const [dataProduct, setDataProduct] = useState([]);
+  const [dataProductDetail, setDataProductDetail] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState("t");
   const [radioDate, setRadioDate] = useState(7);
   const [loading, setLoading] = useState(false);
@@ -55,9 +55,9 @@ export default function TrackingShop() {
   const onChange = (e) => {
     setValue(e.target.value);
   };
-  const fetchShopData = async (data) => {
+  const fetchProductData = async () => {
     const response = await apiCaller({
-      request: trackingApi.dataSHop(data),
+      request: trackingApi.dataProduct(),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
@@ -69,9 +69,9 @@ export default function TrackingShop() {
 
     return null;
   };
-  const fetchAddShop = async (data) => {
+  const fetchAddProduct = async (data) => {
     const response = await apiCaller({
-      request: trackingApi.add_shop(data),
+      request: trackingApi.add_product(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
@@ -83,9 +83,9 @@ export default function TrackingShop() {
 
     return null;
   };
-  const fetchCheckShop = async (data) => {
+  const fetchCheckProduct = async (data) => {
     const response = await apiCaller({
-      request: trackingApi.check_shop(data),
+      request: trackingApi.check_product(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
@@ -99,32 +99,32 @@ export default function TrackingShop() {
   };
   const fetchExtend = async (data) => {
     const response = await apiCaller({
-      request: trackingApi.extendDate(data),
+      request: trackingApi.extendDateProduct(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
     });
 
     if (response) {
-      fetchShopData(data).then((res) => {
-        setDataShop(res.data.tracked_shops);
+      fetchProductData(data).then((res) => {
+        setDataProduct(res.data.tracked_products);
       });
       return response;
     }
 
     return null;
   };
-  const fetchShopDetail = async (data) => {
+  const fetchProductDetail = async (data) => {
     const response = await apiCaller({
-      request: trackingApi.detail_shop(data),
+      request: trackingApi.detail_product(data),
       errorHandler: (error) => {
         console.error("Failed to fetch top discounts:", error);
       },
     });
 
     if (response) {
-      fetchShopData(data).then((res) => {
-        setDataShop(res.data.tracked_shops);
+      fetchProductData(data).then((res) => {
+        setDataProduct(res.data.tracked_products);
       });
       return response;
     }
@@ -134,19 +134,19 @@ export default function TrackingShop() {
   useEffect(() => {
     const data = {
       token: localStorage.getItem("access_token"),
-      shop_id: selectedRow?.platform,
+      product_id: selectedRow?.platform,
     };
     selectedRow &&
-      fetchShopDetail(data).then((res) => {
-        setDataShopDetail(res.data?.revenue_data);
+      fetchProductDetail(data).then((res) => {
+        setDataProductDetail(res.data?.revenue_data);
         console.log(res.data?.revenue_data);
       });
   }, [selectedRow]);
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const data = { token: token };
-    fetchShopData(data).then((res) => {
-      setDataShop(res.data?.tracked_shops);
+    fetchProductData().then((res) => {
+      setDataProduct(res.data?.tracked_products);
     });
   }, []);
   const columns = [
@@ -203,14 +203,6 @@ export default function TrackingShop() {
           >
             Gia hạn
           </Button>
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/shop?shop_id=${record.platform}`);
-            }}
-          >
-            A
-          </Button>
         </>
       ),
     },
@@ -251,20 +243,20 @@ export default function TrackingShop() {
       render: (text) => <p>{text && text?.toLocaleString("vi-VN")}</p>,
     },
   ];
-  const data = dataShop?.map((item, index) => ({
+  const data = dataProduct?.map((item, index) => ({
     key: index + 1,
-    platform: item.shop_id,
-    name: item?.latest_data?.shop_name,
+    platform: item.product_id,
+    name: item?.latest_data?.product_name,
     total: item?.latest_data?.total_revenue,
     sold: item?.latest_data?.total_quantity_sold,
-    date: item?.latest_data?.date,
+    date: item?.latest_data?.updated_date,
     start: item?.tracking_period?.start_date,
     end: item?.tracking_period?.end_date,
   }));
-  const data1 = dataShopDetail?.map((item, index) => ({
+  const data1 = dataProductDetail?.map((item, index) => ({
     key: index + 1,
     date: item.date,
-    name: item?.shop_name,
+    name: item?.product_name,
     total: item?.total_revenue,
     sold: item?.total_quantity_sold,
     daily_revenue: item?.daily_revenue,
@@ -279,7 +271,7 @@ export default function TrackingShop() {
         platform: values.select,
       },
     };
-    fetchCheckShop(data).then((res) => {
+    fetchCheckProduct(data).then((res) => {
       setModal1(true);
       setLoading(false);
       setDataSuccess(res?.data);
@@ -298,22 +290,22 @@ export default function TrackingShop() {
     setIsModalVisible(true);
   };
   const dataDetail = {
-    labels: dataShopDetail.map((val) => formatDate(val.date)),
+    labels: dataProductDetail.map((val) => formatDate(val.date)),
     datasets: [
       {
         label: "Dataset 1",
-        data: dataShopDetail.map((item) => item.total_revenue),
+        data: dataProductDetail.map((item) => item.total_revenue),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
   };
   const dataDetail1 = {
-    labels: dataShopDetail.map((val) => formatDate(val.date)),
+    labels: dataProductDetail.map((val) => formatDate(val.date)),
     datasets: [
       {
         label: "Dataset 1",
-        data: dataShopDetail.map((item) => item.total_quantity_sold),
+        data: dataProductDetail.map((item) => item.total_quantity_sold),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
@@ -351,7 +343,7 @@ export default function TrackingShop() {
     });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, "shop_data.xlsx");
+    XLSX.writeFile(wb, "product_data.xlsx");
   };
   const items = [
     {
@@ -438,7 +430,7 @@ export default function TrackingShop() {
               const data = {
                 token: localStorage.getItem("access_token"),
                 data: {
-                  shop_id: openModal.id,
+                  product_id: openModal.id,
                   extend_days: value,
                 },
               };
@@ -543,7 +535,9 @@ export default function TrackingShop() {
             <img
               style={{ width: "100%" }}
               src={
-                selectedChannel === "t" ? "/tiki_shop.png" : "/sendo_shop.png"
+                selectedChannel === "t"
+                  ? "/tiki_product.jpg"
+                  : "/sendo_product.jpg"
               }
             />
           </div>
@@ -569,25 +563,30 @@ export default function TrackingShop() {
             </div>
           ) : (
             <div>
-              <p>Đã tìm thấy thông tin:</p>
-              <p>Tên: {dataSuccess.shop_name}</p>
-              <p>Url: {dataSuccess.url}</p>
+              <div style={{ display: "flex", gap: 20 }}>
+                <div>
+                  <p>Đã tìm thấy thông tin:</p>
+                  <p>Tên: {dataSuccess.product_name}</p>
+                  <p>Url: {dataSuccess.url}</p>
+                </div>
+                <img src={dataSuccess.image} alt="product" />
+              </div>
               <Button
                 onClick={() => {
                   const data = {
                     token: localStorage.getItem("access_token"),
                     data: {
-                      shop_id: dataSuccess.shop_id,
-                      shop_url: dataSuccess.url,
+                      product_id: dataSuccess.product_id,
+                      product_url: dataSuccess.url,
                       time: radioDate,
                     },
                   };
-                  fetchAddShop(data).then((res) => {
+                  fetchAddProduct(data).then((res) => {
                     const data1 = {
                       token: localStorage.getItem("access_token"),
                     };
-                    fetchShopData(data1).then((res) => {
-                      setDataShop(res.data.tracked_shops);
+                    fetchProductData(data1).then((res) => {
+                      setDataProduct(res.data.tracked_products);
                     });
                     setModal1(false);
 
