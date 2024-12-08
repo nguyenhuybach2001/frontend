@@ -37,4 +37,9 @@ export const authApi = {
       return axiosClient.put("/auth/reset-password", data);
     };
   },
+  changePass: (data) => {
+    return () => {
+      return axiosClient.put("/users/change_password", data);
+    };
+  },
 };

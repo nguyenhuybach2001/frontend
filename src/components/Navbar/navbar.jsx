@@ -16,6 +16,7 @@ import { SearchOutlined } from "@ant-design/icons";
 
 function Navbar() {
   const [form] = Form.useForm();
+  const [form1] = Form.useForm();
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +24,7 @@ function Navbar() {
   const list1 = useSelector((state) => state.product.list1);
   const list2 = useSelector((state) => state.product.list2);
   const [openModal, setOpenModal] = useState(false);
+  const [openModal1, setOpenModal1] = useState(false);
   const fetchTopDiscounts = async (data) => {
     const response = await apiCaller({
       request: homeApi.list_category(data), // Truyền hàm request được định nghĩa
@@ -44,6 +46,23 @@ function Navbar() {
         const access_token = localStorage.getItem("access_token");
         access_token &&
           message.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+        console.log("Failed to fetch top discounts:", error);
+      },
+    });
+
+    if (response) {
+      return response;
+    }
+
+    return null;
+  };
+  const fetchChangePass = async (data) => {
+    const response = await apiCaller({
+      request: authApi.changePass(data),
+      errorHandler: (error) => {
+        if (error.status == 400) {
+          message.error(error?.response?.data?.detail);
+        }
         console.log("Failed to fetch top discounts:", error);
       },
     });
@@ -138,6 +157,20 @@ function Navbar() {
       key: "1",
       label: (
         <p
+          style={{ margin: "0" }}
+          onClick={() => {
+            setOpenModal1(true);
+          }}
+        >
+          Đổi mật khẩu
+        </p>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <p
+          style={{ margin: "0" }}
           onClick={() => {
             localStorage.clear();
             navigate(0);
@@ -153,6 +186,20 @@ function Navbar() {
     navigate(`/search?search=${values.search}`);
     setOpenModal(false);
     form.resetFields();
+  };
+  const onUpdate = (val) => {
+    const data = {
+      old_password: val.old_password,
+      new_password: val.confirm,
+    };
+    fetchChangePass(data).then((res) => {
+      console.log(res, "kokok");
+      if (res.status == 200) {
+        setOpenModal1(false);
+        message.success("Đổi mật khẩu thành công");
+        form1.resetFields();
+      }
+    });
   };
   return (
     <>
@@ -195,7 +242,7 @@ function Navbar() {
               </Dropdown>
             ) : (
               <Link to="/login">
-                <button>Login</button>
+                <Button>Login</Button>
               </Link>
             )}
           </div>
@@ -229,6 +276,92 @@ function Navbar() {
           <Form.Item label={null}>
             <Button type="primary" htmlType="submit">
               Search
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        width={350}
+        title={"Đổi mật khẩu"}
+        open={openModal1}
+        footer={false}
+      >
+        <Form onFinish={onUpdate} layout="vertical" form={form1}>
+          <Form.Item
+            name="old_password"
+            label="Mật khẩu cũ"
+            rules={[
+              {
+                required: true,
+                message: "Please input your old password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="new_password"
+            label="Mật khẩu mới"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập mật khẩu mới!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value.length < 8) {
+                    return Promise.reject("Mật khẩu phải có ít nhất 8 ký tự!");
+                  }
+                  if (!/[A-Z]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 ký tự in hoa!"
+                    );
+                  }
+                  if (!/[0-9]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 chữ số!"
+                    );
+                  }
+                  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt!"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="confirm"
+            label="Confirm Password"
+            dependencies={["new_password"]}
+            rules={[
+              {
+                required: true,
+                message: "Please confirm your password!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("new_password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("The new password that you entered do not match!")
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              B
             </Button>
           </Form.Item>
         </Form>

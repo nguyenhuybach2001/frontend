@@ -75,8 +75,31 @@ export default function SignUp() {
             rules={[
               {
                 required: true,
-                message: "Please input your password!",
+                message: "Vui lòng nhập mật khẩu!",
               },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value.length < 8) {
+                    return Promise.reject("Mật khẩu phải có ít nhất 8 ký tự!");
+                  }
+                  if (!/[A-Z]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 ký tự in hoa!"
+                    );
+                  }
+                  if (!/[0-9]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 chữ số!"
+                    );
+                  }
+                  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+                    return Promise.reject(
+                      "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt!"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              }),
             ]}
           >
             <Input.Password />
