@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import s from "./home.module.scss";
-import { Carousel, Modal, Tabs } from "antd";
+import { Carousel, Modal, Tabs, Tooltip } from "antd";
 import apiCaller from "../../api/apiCaller";
 import { homeApi } from "../../api/homeApi";
 import { Link, useNavigate } from "react-router-dom";
 import { productApi } from "../../api/productApi";
-import { Line } from "@ant-design/charts";
+import { Line } from "react-chartjs-2";
 
 function Home() {
   const navigate = useNavigate();
@@ -75,20 +75,42 @@ function Home() {
       });
     }
   }, [modal]);
-  const data = productDetail?.history
-    ?.map((item) => ({
-      Ngày: item.updated_date,
-      Giá: item.price,
-    }))
-    .sort((a, b) => new Date(a.Ngày) - new Date(b.Ngày));
-  const config = {
-    data,
-    height: 300,
-    xField: "Ngày",
-    yField: "Giá",
-    axis: {
-      x: { title: "Ngày" },
-      y: { title: "Giá" },
+
+  const dataDetail = {
+    labels: productDetail?.history?.map((val) => val.updated_date),
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: productDetail?.history?.map((val) => val.price),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Chart.js Line Chart",
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          callback: function (value, index, ticks) {
+            const dateLabel = dataDetail.labels[index];
+            if (index === 0 || index % 5 === 0) {
+              return dateLabel;
+            }
+            return "";
+          },
+        },
+      },
     },
   };
   const onChange = (key) => {
@@ -98,12 +120,126 @@ function Home() {
     {
       key: "1",
       label: "Lịch sử giá",
-      children: <Line {...config} />,
+      children: <Line options={options} data={dataDetail} />,
     },
     {
       key: "2",
       label: "Sản phẩm liên quan",
-      children: "Content of Tab Pane 2",
+      children:
+        productRelate.length > 0 ? (
+          <Carousel
+            slidesToShow={3}
+            infinite={true}
+            arrows
+            dots={false}
+            draggable={true}
+            className={s.carousel}
+          >
+            {productRelate?.map((val, index) => (
+              <div
+                key={index}
+                className={s.image}
+                style={{ cursor: "default", maxWidth: "200px" }}
+              >
+                <img
+                  style={{ borderRadius: "10px 10px 0 0" }}
+                  src={val.image_url}
+                  alt="image"
+                />
+                <hr
+                  style={{
+                    width: "100%",
+                    color: "black",
+                    marginTop: "0",
+                  }}
+                />
+                <div>
+                  <Tooltip title={val.product_name}>
+                    <p className={s.text_clamp}>{val.product_name}</p>
+                  </Tooltip>
+                  <div className={s.content1}>
+                    <p
+                      style={{
+                        textDecoration: "line-through",
+                        color: "#828282",
+                        fontWeight: 600,
+                        fontSize: 12,
+                      }}
+                    >
+                      {val.origin_price?.toLocaleString("vi-VN")}VNĐ
+                    </p>
+                    <p
+                      style={{
+                        color: "red",
+                        fontWeight: 700,
+                        fontSize: 18,
+                      }}
+                    >
+                      {val.price?.toLocaleString("vi-VN")}VNĐ
+                    </p>
+                  </div>
+                  <div className={s.content2}>
+                    <p>
+                      Đã bán{" "}
+                      {val.all_time_quantity_sold?.toLocaleString("vi-VN")}
+                    </p>
+                    <p
+                      style={{
+                        display: "flex",
+                        gap: "3px",
+                        flexDirection: "row-reverse",
+                      }}
+                    >
+                      <img src="/star.svg" alt="star" />
+                      {val.rating_average}
+                    </p>
+                  </div>
+                  <p className={s.discount}>-{val.discount_rate}%</p>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(10,1fr)",
+                    }}
+                  >
+                    <Link
+                      target="_blank"
+                      className={s.btn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      to={val.url_path}
+                    >
+                      Tới nơi bán
+                    </Link>
+                    {val.category_id.includes("s") ? (
+                      <img
+                        style={{
+                          gridColumn: "span 3",
+                          width: "100%",
+                          borderRadius: "0 0 10px 0",
+                        }}
+                        alt="tiki"
+                        src="/sendo.svg"
+                      />
+                    ) : (
+                      <img
+                        style={{
+                          gridColumn: "span 3",
+                          width: "100%",
+                          borderRadius: "0 0 10px 0",
+                        }}
+                        alt="tiki"
+                        src="/tiki.svg"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </Carousel>
+        ) : (
+          <div>Không có sản phẩm liên quan</div>
+        ),
     },
   ];
 

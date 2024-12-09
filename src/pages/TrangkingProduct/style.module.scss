@@ -3,3 +3,12 @@
   margin: auto;
   padding: 0 25px 30px;
 }
+.text_clamp {
+  padding: 0 10px;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

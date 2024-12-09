@@ -34,6 +34,14 @@
   }
   .content1 {
     display: flex;
+    flex-direction: column-reverse;
+    padding: 10px;
+    p {
+      margin: 0;
+    }
+  }
+  .content2 {
+    display: flex;
     justify-content: space-between;
     padding: 10px;
     p {
@@ -45,7 +53,7 @@
     margin: 0;
     font-weight: 700;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -75,4 +83,19 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.list {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(4, 1fr);
+}
+.carousel {
+  & > button:first-child {
+    color: black !important;
+    inset-inline-start: -10px !important;
+  }
+  & > button:last-child {
+    color: black !important;
+    inset-inline-end: -10px !important;
+  }
 }

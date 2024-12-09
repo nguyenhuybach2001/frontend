@@ -131,7 +131,9 @@ function Navbar() {
         <p
           style={{ margin: "0" }}
           onClick={() => {
-            navigate(`/tracking-shop`);
+            user
+              ? navigate(`/tracking-shop`)
+              : message.info("Vui lòng đăng nhập để xem");
           }}
         >
           Theo dõi shop
@@ -144,7 +146,9 @@ function Navbar() {
         <p
           style={{ margin: "0" }}
           onClick={() => {
-            navigate(`/tracking-product`);
+            user
+              ? navigate(`/tracking-product`)
+              : message.info("Vui lòng đăng nhập để xem");
           }}
         >
           Theo dõi sản phẩm
@@ -173,7 +177,7 @@ function Navbar() {
           style={{ margin: "0" }}
           onClick={() => {
             localStorage.clear();
-            navigate(0);
+            navigate("/");
           }}
         >
           Log out
@@ -218,16 +222,19 @@ function Navbar() {
             <Dropdown overlayClassName={s.dropdown} menu={{ items: item2 }}>
               <p style={{ cursor: "default" }}>Sendo</p>
             </Dropdown>
-            {user && (
-              <>
-                <Link to="/analysis">
-                  <p>Phân tích</p>
-                </Link>
-                <Dropdown overlayClassName={s.dropdown} menu={{ items: item3 }}>
-                  <p style={{ cursor: "default" }}>Phân tích chuyên sâu</p>
-                </Dropdown>
-              </>
-            )}
+            <div
+              onClick={() => {
+                user
+                  ? navigate("/analysis")
+                  : message.info("Vui lòng đăng nhập để xem");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <p>Phân tích</p>
+            </div>
+            <Dropdown overlayClassName={s.dropdown} menu={{ items: item3 }}>
+              <p style={{ cursor: "default" }}>Phân tích chuyên sâu</p>
+            </Dropdown>
           </div>
           <SearchOutlined
             style={{ cursor: "pointer" }}

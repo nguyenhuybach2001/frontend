@@ -24,6 +24,7 @@ import {
   Legend,
 } from "chart.js";
 import * as XLSX from "xlsx";
+import { Tooltip as Tooltip1 } from "antd";
 import { Line } from "react-chartjs-2";
 import { useNavigate } from "react-router-dom";
 
@@ -151,6 +152,12 @@ export default function TrackingProduct() {
   }, []);
   const columns = [
     {
+      title: "Ảnh",
+      dataIndex: "image",
+      key: "image",
+      render: (text) => <img style={{ width: 50 }} src={text} />,
+    },
+    {
       title: "Nền tảng",
       dataIndex: "platform",
       key: "platform",
@@ -160,6 +167,11 @@ export default function TrackingProduct() {
       title: "Tên",
       dataIndex: "name",
       key: "name",
+      render: (text) => (
+        <Tooltip1 title={text}>
+          <p className={s.text_clamp}>{text}</p>,
+        </Tooltip1>
+      ),
     },
     {
       title: "Doanh số",
@@ -218,6 +230,11 @@ export default function TrackingProduct() {
       title: "Tên",
       dataIndex: "name",
       key: "name",
+      render: (text) => (
+        <Tooltip1 title={text}>
+          <p className={s.text_clamp}>{text}</p>,
+        </Tooltip1>
+      ),
     },
     {
       title: "Doanh số",
@@ -250,6 +267,7 @@ export default function TrackingProduct() {
     total: item?.latest_data?.total_revenue,
     sold: item?.latest_data?.total_quantity_sold,
     date: item?.latest_data?.updated_date,
+    image: item?.latest_data?.image_url,
     start: item?.tracking_period?.start_date,
     end: item?.tracking_period?.end_date,
   }));
@@ -386,7 +404,7 @@ export default function TrackingProduct() {
           alignItems: "center",
         }}
       >
-        <h3>Danh sách cửa hàng</h3>
+        <h3>Danh sách sản phẩm</h3>
         <Button
           onClick={() => {
             setModal(true);
@@ -510,8 +528,8 @@ export default function TrackingProduct() {
                   validator: (_, value) => {
                     if (
                       value &&
-                      (value.includes("https://www.sendo.vn/") ||
-                        value.includes("https://www.tiki.vn/"))
+                      (value.includes("sendo.vn/") ||
+                        value.includes("tiki.vn/"))
                     ) {
                       return Promise.resolve();
                     }

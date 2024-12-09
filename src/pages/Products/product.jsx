@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
 import s from "./product.module.scss";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Dropdown, Layout, Menu, Modal, Pagination, Tabs, theme } from "antd";
+import {
+  Carousel,
+  Dropdown,
+  Layout,
+  Menu,
+  Modal,
+  Pagination,
+  Tabs,
+  theme,
+  Tooltip,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import apiCaller from "../../api/apiCaller";
 import { productApi } from "../../api/productApi";
-import { Line } from "@ant-design/charts";
 import { setSortProduct } from "../../features/productSlice";
+import { Line } from "react-chartjs-2";
 const { Header, Content, Footer, Sider } = Layout;
 export default function ProductScreen() {
   const location = useLocation();
@@ -56,20 +66,61 @@ export default function ProductScreen() {
       y: { title: "Giá" },
     },
   };
+  const dataDetail = {
+    labels: productDetail?.history?.map((val) => val.updated_date),
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: productDetail?.history?.map((val) => val.price),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Chart.js Line Chart",
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          callback: function (value, index, ticks) {
+            const dateLabel = dataDetail.labels[index];
+            if (index === 0 || index % 5 === 0) {
+              return dateLabel;
+            }
+            return "";
+          },
+        },
+      },
+    },
+  };
   const items1 = [
     {
       key: "1",
       label: "Lịch sử giá",
-      children: <Line {...config} />,
+      children: <Line options={options} data={dataDetail} />,
     },
     {
       key: "2",
       label: "Sản phẩm liên quan",
       children:
         productRelate.length > 0 ? (
-          <div
-            className={s.list}
-            style={{ gridTemplateColumns: "repeat(3,1fr)" }}
+          <Carousel
+            slidesToShow={3}
+            infinite={true}
+            arrows
+            dots={false}
+            draggable={true}
+            className={s.carousel}
           >
             {productRelate?.map((val, index) => (
               <div
@@ -90,13 +141,16 @@ export default function ProductScreen() {
                   }}
                 />
                 <div>
-                  <p className={s.text_clamp}>{val.product_name}</p>
+                  <Tooltip title={val.product_name}>
+                    <p className={s.text_clamp}>{val.product_name}</p>
+                  </Tooltip>
                   <div className={s.content1}>
                     <p
                       style={{
                         textDecoration: "line-through",
                         color: "#828282",
                         fontWeight: 600,
+                        fontSize: 12,
                       }}
                     >
                       {val.origin_price?.toLocaleString("vi-VN")}VNĐ
@@ -105,12 +159,13 @@ export default function ProductScreen() {
                       style={{
                         color: "red",
                         fontWeight: 700,
+                        fontSize: 18,
                       }}
                     >
                       {val.price?.toLocaleString("vi-VN")}VNĐ
                     </p>
                   </div>
-                  <div className={s.content1}>
+                  <div className={s.content2}>
                     <p>
                       Đã bán{" "}
                       {val.all_time_quantity_sold?.toLocaleString("vi-VN")}
@@ -168,7 +223,7 @@ export default function ProductScreen() {
                 </div>
               </div>
             ))}
-          </div>
+          </Carousel>
         ) : (
           <div>Không có sản phẩm liên quan</div>
         ),
