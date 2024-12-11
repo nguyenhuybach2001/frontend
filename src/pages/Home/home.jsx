@@ -11,6 +11,7 @@ function Home() {
   const navigate = useNavigate();
   const [productDetail, setProductDetail] = useState({});
   const [productRelate, setProductRelate] = useState({});
+  const [loading, setLoading] = useState(true);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
@@ -24,6 +25,7 @@ function Home() {
     });
 
     if (response) {
+      setLoading(false);
       return response;
     }
 
@@ -59,6 +61,7 @@ function Home() {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchTopDiscounts({ category_id: "s94" }).then((res) =>
       setData1(res.data.products)
     );
@@ -133,7 +136,7 @@ function Home() {
             arrows
             dots={false}
             draggable={true}
-            className={s.carousel}
+            lo
           >
             {productRelate?.map((val, index) => (
               <div
