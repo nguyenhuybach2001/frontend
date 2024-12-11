@@ -32,7 +32,7 @@ export default function ProductScreen() {
     content:true,
     priceHistory: true,
     relatedProducts: true,
-  });;
+  });
   const setLoading = (key, value) => {
     setLoadingStates((prev) => ({ ...prev, [key]: value }));
   };

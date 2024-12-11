@@ -20,6 +20,15 @@ export default function SearchScreen() {
   const [modal, setModal] = useState({ open: false, product_id: null });
   const [dataList, setDataList] = useState([]);
   const [pageCount, setPageCount] = useState(1);
+  const [loading, setLoadingStates] = useState({
+    page:true,
+    content:true,
+    priceHistory: true,
+    relatedProducts: true,
+  });
+  const setLoading = (key, value) => {
+    setLoadingStates((prev) => ({ ...prev, [key]: value }));
+  };
   useEffect(() => {
     if (searchKey) {
       dispatch(setSearchProduct({ keyword: searchKey }));
