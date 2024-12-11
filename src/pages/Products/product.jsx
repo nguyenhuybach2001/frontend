@@ -25,7 +25,8 @@ export default function ProductScreen() {
   const [pageCount, setPageCount] = useState(1);
   const queryParams = new URLSearchParams(location.search);
   const category_id = queryParams.get("category_id");
-  const [loading, setLoading] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [loadingModal, setLoadingModal] = useState(true);
   const [productDetail, setProductDetail] = useState({});
   const [productRelate, setProductRelate] = useState([]);
   const [modal, setModal] = useState({ open: false, product_id: null });
@@ -120,7 +121,6 @@ export default function ProductScreen() {
             arrows
             dots={false}
             draggable={true}
-            className={s.carousel}
           >
             {productRelate?.map((val, index) => (
               <div
@@ -242,6 +242,7 @@ export default function ProductScreen() {
     });
 
     if (response) {
+      setLoadingPage(false);
       return response;
     }
 
@@ -256,6 +257,7 @@ export default function ProductScreen() {
     });
 
     if (response) {
+      setLoadingModal(false);
       return response;
     }
 
@@ -283,14 +285,16 @@ export default function ProductScreen() {
     }
   }, [category_id]);
   useEffect(() => {
+    setLoadingPage(true);
     if (sortProduct.category_id) {
       fetchListProduct(sortProduct).then((res) => {
         setDataList(res.data);
-        setLoading(false);
       });
     }
   }, [sortProduct]);
+
   useEffect(() => {
+    setLoadingModal(true);
     if (modal.product_id != null) {
       fetchProductDetail({ product_id: modal.product_id }).then((res) => {
         setProductDetail(res.data);
@@ -380,86 +384,86 @@ export default function ProductScreen() {
       ),
     },
   ];
-
+  console.log(loadingPage, "okopko");
   return (
     <>
-      {loading ? (
-        <p>loading...</p>
-      ) : (
-        <Layout hasSider>
-          <Sider style={siderStyle}>
-            <div className="demo-logo-vertical" />
-            <Menu
-              theme="dark"
-              mode="inline"
-              selectedKeys={[sortProduct.category_id]}
-              items={items}
-              onClick={onClick}
-            />
-          </Sider>
-          <Layout
+      <Layout hasSider>
+        <Sider style={siderStyle}>
+          <div className="demo-logo-vertical" />
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={[sortProduct.category_id]}
+            items={items}
+            onClick={onClick}
+          />
+        </Sider>
+        <Layout
+          style={{
+            marginInlineStart: 200,
+          }}
+        >
+          <Header
             style={{
-              marginInlineStart: 200,
+              position: "sticky",
+              top: "70px",
+              zIndex: 99,
+              gap: "20px",
+              background: colorBgContainer,
+              display: "flex",
             }}
           >
-            <Header
-              style={{
-                position: "sticky",
-                top: "70px",
-                zIndex: 99,
-                gap: "20px",
-                background: colorBgContainer,
-                display: "flex",
-              }}
+            <div style={{ width: "150px" }}>
+              {sortProduct.category_id.includes("s") ? (
+                <img
+                  style={{
+                    gridColumn: "span 3",
+                    height: "100%",
+                    borderRadius: "0 0 10px 0",
+                  }}
+                  alt="tiki"
+                  src="/sendo.svg"
+                />
+              ) : (
+                <img
+                  style={{
+                    gridColumn: "span 3",
+                    height: "100%",
+                    borderRadius: "0 0 10px 0",
+                  }}
+                  alt="tiki"
+                  src="/tiki.svg"
+                />
+              )}
+            </div>
+            <Dropdown
+              overlayClassName={s.dropdown}
+              menu={{ items: itemSort1 }}
+              trigger={"click"}
             >
-              <div style={{ width: "150px" }}>
-                {sortProduct.category_id.includes("s") ? (
-                  <img
-                    style={{
-                      gridColumn: "span 3",
-                      height: "100%",
-                      borderRadius: "0 0 10px 0",
-                    }}
-                    alt="tiki"
-                    src="/sendo.svg"
-                  />
-                ) : (
-                  <img
-                    style={{
-                      gridColumn: "span 3",
-                      height: "100%",
-                      borderRadius: "0 0 10px 0",
-                    }}
-                    alt="tiki"
-                    src="/tiki.svg"
-                  />
-                )}
-              </div>
-              <Dropdown
-                overlayClassName={s.dropdown}
-                menu={{ items: itemSort1 }}
-                trigger={"click"}
-              >
-                <p style={{ margin: "0", fontWeight: 700, cursor: "pointer" }}>
-                  Theo giá
-                </p>
-              </Dropdown>
-              <Dropdown
-                overlayClassName={s.dropdown}
-                menu={{ items: itemSort2 }}
-                trigger={"click"}
-              >
-                <p style={{ margin: "0", fontWeight: 700, cursor: "pointer" }}>
-                  Đã bán
-                </p>
-              </Dropdown>
-            </Header>
-            <Content
-              style={{
-                margin: "24px 16px 0",
-                overflow: "initial",
-              }}
+              <p style={{ margin: "0", fontWeight: 700, cursor: "pointer" }}>
+                Theo giá
+              </p>
+            </Dropdown>
+            <Dropdown
+              overlayClassName={s.dropdown}
+              menu={{ items: itemSort2 }}
+              trigger={"click"}
             >
+              <p style={{ margin: "0", fontWeight: 700, cursor: "pointer" }}>
+                Đã bán
+              </p>
+            </Dropdown>
+          </Header>
+          <Content
+            style={{
+              margin: "24px 16px 0",
+              overflow: "initial",
+            }}
+          >
+            {loadingPage ? (
+              "ddđ"
+            ) : (
               <div
                 style={{
                   padding: 24,
@@ -484,6 +488,10 @@ export default function ProductScreen() {
                         style={{ borderRadius: "10px 10px 0 0" }}
                         src={val.image_url}
                         alt="image"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/imgFallBack.png";
+                        }}
                       />
                       <hr
                         style={{
@@ -589,10 +597,10 @@ export default function ProductScreen() {
                   showSizeChanger={false}
                 />
               </div>
-            </Content>
-          </Layout>
+            )}
+          </Content>
         </Layout>
-      )}
+      </Layout>
       <Modal
         width={700}
         open={modal.open}
@@ -601,8 +609,14 @@ export default function ProductScreen() {
         }}
         footer={false}
       >
-        <h2 className={s.text_clamp1}>{productDetail.product_name}</h2>
-        <Tabs defaultActiveKey="1" items={items1} />
+        {loadingModal ? (
+          <p>ddd</p>
+        ) : (
+          <>
+            <h2 className={s.text_clamp1}>{productDetail.product_name}</h2>
+            <Tabs defaultActiveKey="1" items={items1} />
+          </>
+        )}
       </Modal>
     </>
   );
