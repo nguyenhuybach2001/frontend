@@ -6,12 +6,15 @@ import { homeApi } from "../../api/homeApi";
 import { Link, useNavigate } from "react-router-dom";
 import { productApi } from "../../api/productApi";
 import { Line } from "react-chartjs-2";
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin } from 'antd';
 
 function Home() {
   const navigate = useNavigate();
   const [productDetail, setProductDetail] = useState({});
   const [productRelate, setProductRelate] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [loadingModal, setLoadingModal] = useState(true);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
@@ -25,7 +28,7 @@ function Home() {
     });
 
     if (response) {
-      setLoading(false);
+      setLoadingPage(false);
       return response;
     }
 
@@ -40,6 +43,7 @@ function Home() {
     });
 
     if (response) {
+      setLoadingModal(false);
       return response;
     }
 
@@ -61,12 +65,13 @@ function Home() {
   };
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingPage(true);
     fetchTopDiscounts({ category_id: "s94" }).then((res) =>
       setData1(res.data.products)
     );
   }, []);
   useEffect(() => {
+    setLoadingModal(true)
     if (modal.product_id != null) {
       fetchProductDetail({ product_id: modal.product_id }).then((res) => {
         setProductDetail(res.data);
@@ -249,120 +254,142 @@ function Home() {
   return (
     <div className={s.wrapper}>
       <div className={s.body}>
-        <h1>Home Page</h1>
-        <p>Welcome to the Home Page!</p>
+        <h1>Nền tảng số liệu thương mại điện tử</h1>
+        <p>Cung cấp số liệu chi tiết về xu hướng thị trường và hiệu suất sản phẩm trên các sàn thương mại điện tử,
+          giúp tối ưu hóa chiến lược kinh doanh của bạn.</p>
       </div>
-      <h2>Thời trang nam</h2>
-      <Carousel
-        autoplay={modal.open !== true ? true : false}
-        autoplaySpeed={1500}
-        slidesToShow={3}
-        infinite={true}
-        centerMode={true}
-        dots={false}
-        draggable={true}
+      {loadingPage ? (<Flex
+        align="center"
+        justify="center"
+        style={{
+          height: "100%",
+          padding: "24px",
+        }}
       >
-        {data1.map((val, index) => (
-          <div
-            key={index}
-            className={s.image}
-            onClick={(e) => {
-              e.stopPropagation();
-              setModal({
-                open: true,
-                product_id: val.product_id,
-              });
-            }}
-          >
-            <img
-              style={{ borderRadius: "10px 10px 0 0" }}
-              src={val.image_url}
-              alt="image"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/imgFallBack.png";
+        <Spin
+          indicator={
+            <LoadingOutlined
+              style={{
+                fontSize: 48,
+                color: "#1890ff",
               }}
+              spin
             />
-            <hr style={{ width: "100%", color: "black", marginTop: "0" }} />
-            <div>
-              <p className={s.text_clamp}>{val.product_name}</p>
-              <div className={s.content1}>
-                <p
-                  style={{
-                    textDecoration: "line-through",
-                    color: "#828282",
-                    fontWeight: 600,
-                  }}
-                >
-                  {val.origin_price.toLocaleString("vi-VN")}VNĐ
-                </p>
-                <p
-                  style={{
-                    color: "red",
-                    fontWeight: 700,
-                  }}
-                >
-                  {val.price.toLocaleString("vi-VN")}VNĐ
-                </p>
-              </div>
-              <div className={s.content1}>
-                <p>
-                  Đã bán {val.all_time_quantity_sold.toLocaleString("vi-VN")}
-                </p>
-                <p
-                  style={{
-                    display: "flex",
-                    gap: "3px",
-                    flexDirection: "row-reverse",
-                  }}
-                >
-                  <img src="/star.svg" alt="star" />
-                  {val.rating_average}
-                </p>
-              </div>
-              <p className={s.discount}>-{val.discount_rate}%</p>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(10,1fr)",
+          }
+        />
+      </Flex>) : (<>
+        <h2>Thời trang nam</h2>
+        <Carousel
+          autoplay={modal.open !== true ? true : false}
+          autoplaySpeed={1500}
+          slidesToShow={5}
+          infinite={true}
+          centerMode={true}
+          dots={false}
+          draggable={true}
+        >
+          {data1.map((val, index) => (
+            <div
+              key={index}
+              className={s.image}
+              onClick={(e) => {
+                e.stopPropagation();
+                setModal({
+                  open: true,
+                  product_id: val.product_id,
+                });
+              }}
+            >
+              <img
+                style={{ borderRadius: "10px 10px 0 0" }}
+                src={val.image_url}
+                alt="image"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/imgFallBack.png";
                 }}
-              >
-                <Link
-                  target="_blank"
-                  className={s.btn}
-                  onClick={(e) => {
-                    e.stopPropagation();
+              />
+              <hr style={{ width: "100%", color: "black", marginTop: "0" }} />
+              <div>
+                <p className={s.text_clamp}>{val.product_name}</p>
+                <div className={s.content1}>
+                  <p
+                    style={{
+                      textDecoration: "line-through",
+                      color: "#828282",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {val.origin_price.toLocaleString("vi-VN")}VNĐ
+                  </p>
+                  <p
+                    style={{
+                      color: "red",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {val.price.toLocaleString("vi-VN")}VNĐ
+                  </p>
+                </div>
+                <div className={s.content1}>
+                  <p>
+                    Đã bán {val.all_time_quantity_sold.toLocaleString("vi-VN")}
+                  </p>
+                  <p
+                    style={{
+                      display: "flex",
+                      gap: "3px",
+                      flexDirection: "row-reverse",
+                    }}
+                  >
+                    <img src="/star.svg" alt="star" />
+                    {val.rating_average}
+                  </p>
+                </div>
+                <p className={s.discount}>-{val.discount_rate}%</p>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(10,1fr)",
                   }}
-                  to={val.url_path}
                 >
-                  Tới nơi bán
-                </Link>
-                {val.category_id.includes("s") ? (
-                  <img
-                    style={{
-                      gridColumn: "span 3",
-                      width: "100%",
-                      borderRadius: "0 0 10px 0",
+                  <Link
+                    target="_blank"
+                    className={s.btn}
+                    onClick={(e) => {
+                      e.stopPropagation();
                     }}
-                    alt="tiki"
-                    src="/sendo.svg"
-                  />
-                ) : (
-                  <img
-                    style={{
-                      gridColumn: "span 3",
-                      width: "100%",
-                      borderRadius: "0 0 10px 0",
-                    }}
-                    alt="tiki"
-                    src="/tiki.svg"
-                  />
-                )}
+                    to={val.url_path}
+                  >
+                    Tới nơi bán
+                  </Link>
+                  {val.category_id.includes("s") ? (
+                    <img
+                      style={{
+                        gridColumn: "span 3",
+                        width: "100%",
+                        borderRadius: "0 0 10px 0",
+                      }}
+                      alt="tiki"
+                      src="/sendo.svg"
+                    />
+                  ) : (
+                    <img
+                      style={{
+                        gridColumn: "span 3",
+                        width: "100%",
+                        borderRadius: "0 0 10px 0",
+                      }}
+                      alt="tiki"
+                      src="/tiki.svg"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Carousel>
+          ))}
+        </Carousel></>)}
+
       <Modal
         width={700}
         open={modal.open}
@@ -371,8 +398,29 @@ function Home() {
         }}
         footer={false}
       >
-        <h2 className={s.text_clamp1}>{productDetail.product_name}</h2>
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        {loadingModal ? (<Flex
+          align="center"
+          justify="center"
+          style={{
+            height: "100%",
+            padding: "24px",
+          }}
+        >
+          <Spin
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 48,
+                  color: "#1890ff",
+                }}
+                spin
+              />
+            }
+          />
+        </Flex>) :
+          (<><h2 className={s.text_clamp1}>{productDetail.product_name}</h2>
+            <Tabs defaultActiveKey="1" items={items} onChange={onChange} /></>)}
+
       </Modal>
     </div>
   );

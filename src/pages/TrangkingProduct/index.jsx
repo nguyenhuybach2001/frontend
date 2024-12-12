@@ -161,7 +161,7 @@ export default function TrackingProduct() {
       title: "Nền tảng",
       dataIndex: "platform",
       key: "platform",
-      render: (text) => <p>{text.includes("t") ? "Tiki" : "Sen đỏ"}</p>,
+      render: (text) => <p>{text.includes("t") ? "Tiki" : "Sendo"}</p>,
     },
     {
       title: "Tên",
@@ -169,7 +169,7 @@ export default function TrackingProduct() {
       key: "name",
       render: (text) => (
         <Tooltip1 title={text}>
-          <p className={s.text_clamp}>{text}</p>,
+          <p className={s.text_clamp}>{text}</p>
         </Tooltip1>
       ),
     },
@@ -232,7 +232,7 @@ export default function TrackingProduct() {
       key: "name",
       render: (text) => (
         <Tooltip1 title={text}>
-          <p className={s.text_clamp}>{text}</p>,
+          <p className={s.text_clamp}>{text}</p>
         </Tooltip1>
       ),
     },

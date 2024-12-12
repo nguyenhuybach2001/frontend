@@ -12,6 +12,8 @@ import {
 } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
 import { Tabs } from "antd";
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin } from 'antd';
 import apiCaller from "../../api/apiCaller";
 import { analysisApi } from "../../api/analysisApi";
 
@@ -24,7 +26,8 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-const options = {
+
+const options1 = {
   indexAxis: "y",
   elements: {
     bar: {
@@ -39,11 +42,45 @@ const options = {
     },
     title: {
       display: true,
-      text: "Chart.js Horizontal Bar Chart",
+      text: "Doanh số theo ngành hàng",
+      font: {
+        size: 24,
+        weight: "bold",
+        family: "Arial",
+      },
+      color: "#333333",
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Doanh số (Đồng)", 
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: "Ngành hàng", 
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
     },
   },
 };
-const options1 = {
+
+const options2 = {
+  indexAxis: "y",
   elements: {
     bar: {
       borderWidth: 2,
@@ -57,15 +94,131 @@ const options1 = {
     },
     title: {
       display: true,
-      text: "Chart.js Horizontal Bar Chart",
+      text: "Số sản phẩm đã bán",
+      font: {
+        size: 24,
+        weight: "bold",
+        family: "Arial",
+      },
+      color: "#333333",
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Số lượng",
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: "Ngành hàng", 
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
+    },
+  },
+};
+const options3 = {
+  elements: {
+    bar: {
+      borderWidth: 2,
+    },
+  },
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top",
+      display: false,
+    },
+    title: {
+      display: true,
+      text: "Doanh số theo mức giá",
+      font: {
+        size: 24,
+        weight: "bold",
+        family: "Arial",
+      },
+      color: "#333333",
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Doanh số (Đồng)", 
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: "Mức giá", 
+        font: {
+          size: 16,
+          weight: "bold",
+          family: "Arial",
+        },
+        color: "#555555", 
+      },
+    },
+  },
+};
+const options4 = {
+  plugins: {
+    legend: {
+      position: "bottom", // Legend nằm bên phải
+      labels: {
+        boxWidth: 10, // Kích thước ô màu
+        padding: 15, // Khoảng cách giữa các nhãn
+        usePointStyle: true, // Hiển thị hình tròn thay vì ô vuông
+        generateLabels: (chart) => {
+          const data = chart.data;
+          return data.labels.map((label, index) => ({
+            text: label,
+            fillStyle: data.datasets[0].backgroundColor[index],
+          }));
+        },
+      },
+    },
+    title: {
+      display: true,
+      text: "Top 20 cửa hàng",
+      font: {
+        size: 24,
+        weight: "bold",
+        family: "Arial",
+      },
+      color: "#333333",
+    },
+  },
+  layout: {
+    padding: {
+      right: 5, // Khoảng cách giữa biểu đồ và legend
     },
   },
 };
 function getRandomLightColor() {
-  const r = Math.floor(Math.random() * 156) + 100; // Giá trị từ 100 đến 255
-  const g = Math.floor(Math.random() * 156) + 100; // Giá trị từ 100 đến 255
-  const b = Math.floor(Math.random() * 156) + 100; // Giá trị từ 100 đến 255
-  return `rgb(${r}, ${g}, ${b})`;
+  const hue = Math.floor(Math.random() * 360); // Dải màu ngẫu nhiên
+  const saturation = 80 + Math.random() * 20; // Tăng độ bão hòa từ 80% - 100%
+  const lightness = 50 + Math.random() * 10; // Độ sáng vừa phải từ 50% - 60%
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 function generateLightColors(length) {
@@ -79,7 +232,9 @@ export default function AnalysisScreen() {
   const [data3, setData3] = useState([]);
   const [data4, setData4] = useState([]);
   const [data5, setData5] = useState([]);
+  const [loadingPage, setLoadingPage] = useState(true);
   const backgroundColors = generateLightColors(data2.length);
+
   const fetchRevenue = async (data) => {
     const response = await apiCaller({
       request: analysisApi.revenue(data),
@@ -151,6 +306,7 @@ export default function AnalysisScreen() {
     return null;
   };
   useEffect(() => {
+    
     const token = localStorage.getItem("access_token");
     const data = { token: token, type: type };
     fetchRevenue(data).then((res) => {
@@ -172,16 +328,51 @@ export default function AnalysisScreen() {
         setData5(res.data?.list);
         console.log(res.data);
       });
+    setLoadingPage(false)
   }, [type]);
 
   const dataList1 = {
     labels: data1.map((val) => val.category_name),
     datasets: [
       {
-        label: "Dataset 1",
+        label: "",
         data: data1.map((val) => val.total_revenue),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgb(0, 0, 0, 0)",
+        backgroundColor: data1.map((_, index) => {
+          const ctx = document.getElementById("chart1").getContext("2d");
+          const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          if (type === "t") {
+            gradient.addColorStop(0, "rgba(0,0,255,1)");
+            gradient.addColorStop(1, "rgba(0,212,255,1)");
+          } else if (type === "s") {
+            gradient.addColorStop(0, "rgba(255,0,0,1)");
+            gradient.addColorStop(1, "rgba(255,165,0,1)");
+          }
+          return gradient;
+        }),
+      },
+    ],
+  };
+
+  const dataList3 = {
+    labels: data3.map((val) => val.category_name),
+    datasets: [
+      {
+        label: "",
+        data: data3.map((val) => val.total_quantity_sold),
+        borderColor: "rgb(0, 0, 0, 0)",
+        backgroundColor: data1.map((_, index) => {
+          const ctx = document.getElementById("chart2").getContext("2d");
+          const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          if (type === "t") {
+            gradient.addColorStop(0, "rgba(0,0,255,1)");
+            gradient.addColorStop(1, "rgba(0,212,255,1)");
+          } else if (type === "s") {
+            gradient.addColorStop(0, "rgba(255,0,0,1)");
+            gradient.addColorStop(1, "rgba(255,165,0,1)");
+          }
+          return gradient;
+        }),
       },
     ],
   };
@@ -189,21 +380,21 @@ export default function AnalysisScreen() {
     labels: (type == "t" ? data4 : data5).map((val) => val.price_range),
     datasets: [
       {
-        label: "Dataset 1",
+        label: "",
         data: (type == "t" ? data4 : data5).map((val) => val.total_sales),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-    ],
-  };
-  const dataList3 = {
-    labels: data3.map((val) => val.category_name),
-    datasets: [
-      {
-        label: "Dataset 1",
-        data: data3.map((val) => val.total_quantity_sold),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgb(0, 0, 0, 0)",
+        backgroundColor: data1.map((_, index) => {
+          const ctx = document.getElementById("chart3").getContext("2d");
+          const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          if (type === "t") {
+            gradient.addColorStop(0, "rgba(0,0,255,1)");
+            gradient.addColorStop(1, "rgba(0,212,255,1)");
+          } else if (type === "s") {
+            gradient.addColorStop(0, "rgba(255,0,0,1)");
+            gradient.addColorStop(1, "rgba(255,165,0,1)");
+          }
+          return gradient;
+        }),
       },
     ],
   };
@@ -211,7 +402,7 @@ export default function AnalysisScreen() {
     labels: data2.map((val) => val.shop_name),
     datasets: [
       {
-        label: "# of Votes",
+        label: "",
         data: data2.map((val) => val.total_revenue),
         backgroundColor: backgroundColors,
       },
@@ -222,50 +413,100 @@ export default function AnalysisScreen() {
       key: "1",
       label: "Tiki",
       children: (
-        <div>
-          <Bar options={options} data={dataList1} />
-          <Bar options={options} data={dataList3} />
-          <Bar options={options1} data={dataList4} />
-          <Doughnut
-            style={{ margin: "auto" }}
-            width={500}
-            height={500}
-            data={dataList2}
-          />
+        <div style={{ backgroundColor: "#f0f0f0", padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginBottom: "50px" }}>
+            <Bar id="chart1" options={options1} data={dataList1} />
+          </div>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginBottom: "50px" }}>
+            <Bar id="chart2" options={options2} data={dataList3} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", marginBottom: "20px" }}>
+            {/* Biểu đồ Chart3 */}
+            <div style={{ flex: 1, maxWidth: "50%", backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginRight: "10px" }}>
+              <Bar id="chart3" options={options3} data={dataList4} />
+            </div>
+            {/* Biểu đồ Doughnut */}
+            <div style={{ flex: 1, maxWidth: "50%", backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginLeft: "10px" }}>
+              <Doughnut
+                style={{ margin: "auto" }}
+                width={500}
+                height={500}
+                data={dataList2}
+                options={options4}
+              />
+            </div>
+          </div>
         </div>
       ),
     },
     {
       key: "2",
-      label: "Sen đỏ",
+      label: "Sendo",
       children: (
-        <div>
-          <Bar options={options} data={dataList1} />
-          <Bar options={options} data={dataList3} />
-          <Bar options={options1} data={dataList4} />
-          <Doughnut
-            style={{ margin: "auto" }}
-            width={500}
-            height={500}
-            data={dataList2}
-          />
+        <div style={{ backgroundColor: "#f0f0f0", padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginBottom: "50px" }}>
+            <Bar id="chart1" options={options1} data={dataList1} />
+          </div>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginBottom: "50px" }}>
+            <Bar id="chart2" options={options2} data={dataList3} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", marginBottom: "20px" }}>
+            {/* Biểu đồ Chart3 */}
+            <div style={{ flex: 1, maxWidth: "50%", backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginRight: "10px" }}>
+              <Bar id="chart3" options={options3} data={dataList4} />
+            </div>
+            {/* Biểu đồ Doughnut */}
+            <div style={{ flex: 1, maxWidth: "50%", backgroundColor: "#ffffff", borderRadius: "10px", padding: "20px", marginLeft: "10px" }}>
+              <Doughnut
+                style={{ margin: "auto" }}
+                width={500}
+                height={500}
+                data={dataList2}
+                options={options4}
+              />
+            </div>
+          </div>
         </div>
       ),
     },
   ];
   return (
     <div className={s.body}>
-      <Tabs
-        defaultActiveKey="1"
-        items={items1}
-        onChange={(e) => {
-          if (e == "1") {
-            setType("t");
-          } else if (e == "2") {
-            setType("s");
-          }
+      {loadingPage ? (<Flex
+        align="center"
+        justify="center"
+        style={{
+          height: "100%",
+          padding: "24px",
         }}
-      />
+      >
+        <Spin
+          indicator={
+            <LoadingOutlined
+              style={{
+                fontSize: 48,
+                color: "#1890ff",
+              }}
+              spin
+            />
+          }
+        />
+      </Flex>) : (
+        <Tabs
+          defaultActiveKey="1"
+          items={items1}
+          tabBarStyle={{
+            fontSize: "18px", // Tăng kích thước chữ
+            fontWeight: "bold", // Tùy chọn, làm chữ đậm hơn
+          }}
+          onChange={(e) => {
+            if (e == "1") {
+              setType("t");
+            } else if (e == "2") {
+              setType("s");
+            }
+          }}
+        />)}
     </div>
   );
 }

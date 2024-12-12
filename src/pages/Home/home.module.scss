@@ -1,3 +1,28 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
+  
+
+  h1 {
+    font-size: 2.5rem; /* Kích thước lớn */
+    font-weight: bold;
+    color: #333; /* Màu chữ chính */
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.25rem; /* Kích thước vừa phải */
+    color: #555; /* Màu chữ phụ */
+    line-height: 1.6; /* Tăng khoảng cách dòng */
+    max-width: 800px; /* Định khung tối đa */
+    margin: 0 auto; /* Căn giữa */
+  }
+}
+
 .wrapper {
   max-width: 950px;
   margin: auto;

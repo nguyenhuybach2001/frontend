@@ -154,7 +154,7 @@ export default function TrackingShop() {
       title: "Nền tảng",
       dataIndex: "platform",
       key: "platform",
-      render: (text) => <p>{text.includes("t") ? "Tiki" : "Sen đỏ"}</p>,
+      render: (text) => <p>{text.includes("t") ? "Tiki" : "Sendo"}</p>,
     },
     {
       title: "Tên",
@@ -209,7 +209,7 @@ export default function TrackingShop() {
               navigate(`/shop?shop_id=${record.platform}`);
             }}
           >
-            A
+            Sản phẩm
           </Button>
         </>
       ),
@@ -487,7 +487,7 @@ export default function TrackingShop() {
             >
               <Select placeholder="Vui lòng chọn kênh">
                 <Option value="t">Tiki</Option>
-                <Option value="s">Sen đỏ</Option>
+                <Option value="s">Sendo</Option>
               </Select>
             </Form.Item>
 

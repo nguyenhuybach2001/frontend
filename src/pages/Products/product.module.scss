@@ -92,3 +92,9 @@
     inset-inline-end: -10px !important;
   }
 }
+
+:global(.ant-layout-sider) {
+  width: 302px !important;
+  max-width: none !important;
+  min-width: none !important;
+}

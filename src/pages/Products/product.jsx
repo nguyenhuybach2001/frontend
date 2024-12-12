@@ -13,6 +13,8 @@ import {
   Tooltip,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin } from 'antd';
 import apiCaller from "../../api/apiCaller";
 import { productApi } from "../../api/productApi";
 import { setSortProduct } from "../../features/productSlice";
@@ -71,7 +73,7 @@ export default function ProductScreen() {
     labels: productDetail?.history?.map((val) => val.updated_date),
     datasets: [
       {
-        label: "Dataset 1",
+        label: "",
         data: productDetail?.history?.map((val) => val.price),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
@@ -86,20 +88,42 @@ export default function ProductScreen() {
         display: false,
       },
       title: {
-        display: true,
-        text: "Chart.js Line Chart",
+        display: false,
+        text: "Lịch sử giá",
       },
     },
     scales: {
       x: {
+        title: {
+          display: true,
+          text: "Ngày", 
+          font: {
+            size: 16,
+            weight: "bold",
+            family: "Arial",
+          },
+          color: "#555555", 
+        },
         ticks: {
           callback: function (value, index, ticks) {
             const dateLabel = dataDetail.labels[index];
-            if (index === 0 || index % 5 === 0) {
+            if (index === 0 || index % 3 === 0) {
               return dateLabel;
             }
             return "";
           },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Giá (Đồng)", 
+          font: {
+            size: 16,
+            weight: "bold",
+            family: "Arial",
+          },
+          color: "#555555", 
         },
       },
     },
@@ -384,23 +408,29 @@ export default function ProductScreen() {
       ),
     },
   ];
-  console.log(loadingPage, "okopko");
+
   return (
     <>
       <Layout hasSider>
-        <Sider style={siderStyle}>
+        <Sider style={siderStyle
+        }>
           <div className="demo-logo-vertical" />
           <Menu
-            theme="dark"
+            
             mode="inline"
             selectedKeys={[sortProduct.category_id]}
             items={items}
+            style={{
+              backgroundColor: sortProduct.category_id.includes("s")
+                ? "rgb(255 255 255)" // Màu nền menu cho Sendo
+                : "rgb(255 255 255)", // Màu nền menu cho Tiki
+            }}
             onClick={onClick}
           />
         </Sider>
         <Layout
           style={{
-            marginInlineStart: 200,
+            marginInlineStart: 302,
           }}
         >
           <Header
@@ -421,7 +451,7 @@ export default function ProductScreen() {
                     height: "100%",
                     borderRadius: "0 0 10px 0",
                   }}
-                  alt="tiki"
+                  alt="sendo"
                   src="/sendo.svg"
                 />
               ) : (
@@ -459,10 +489,30 @@ export default function ProductScreen() {
             style={{
               margin: "24px 16px 0",
               overflow: "initial",
+
             }}
           >
             {loadingPage ? (
-              "ddđ"
+              <Flex
+              align="center"
+              justify="center"
+              style={{
+                height: "100%", 
+                padding: "24px",
+              }}
+            >
+              <Spin
+                indicator={
+                  <LoadingOutlined
+                    style={{
+                      fontSize: 48,
+                      color: "#1890ff", 
+                    }}
+                    spin
+                  />
+                }
+              />
+            </Flex>
             ) : (
               <div
                 style={{
@@ -600,9 +650,9 @@ export default function ProductScreen() {
             )}
           </Content>
         </Layout>
-      </Layout>
+      </Layout >
       <Modal
-        width={700}
+        width={1200}
         open={modal.open}
         onCancel={() => {
           setModal({ open: false, product_id: null });
@@ -610,7 +660,26 @@ export default function ProductScreen() {
         footer={false}
       >
         {loadingModal ? (
-          <p>ddd</p>
+          <Flex
+          align="center"
+          justify="center"
+          style={{
+            height: "100%", 
+            padding: "24px",
+          }}
+        >
+          <Spin
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 48,
+                  color: "#1890ff", 
+                }}
+                spin
+              />
+            }
+          />
+        </Flex>
         ) : (
           <>
             <h2 className={s.text_clamp1}>{productDetail.product_name}</h2>

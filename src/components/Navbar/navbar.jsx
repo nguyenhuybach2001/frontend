@@ -230,7 +230,7 @@ function Navbar() {
               }}
               style={{ cursor: "pointer" }}
             >
-              <p>Phân tích</p>
+              <p>Báo cáo thị trường</p>
             </div>
             <Dropdown overlayClassName={s.dropdown} menu={{ items: item3 }}>
               <p style={{ cursor: "default" }}>Phân tích chuyên sâu</p>
